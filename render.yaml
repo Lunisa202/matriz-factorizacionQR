@@ -13,6 +13,8 @@ services:
     envVars:
       - key: PORT
         value: 10000 # Render inyecta su propio PORT; la app usa $PORT
+      - key: NODE_ENV
+        value: production # activa el fail-fast si JWT_SECRET sigue siendo el de ejemplo
       - key: JWT_SECRET
         sync: false # definir manualmente en el dashboard (mismo valor en ambos)
       - key: NODE_API_URL
@@ -30,5 +32,7 @@ services:
     envVars:
       - key: PORT
         value: 10000
+      - key: NODE_ENV
+        value: production # activa el fail-fast si JWT_SECRET sigue siendo el de ejemplo
       - key: JWT_SECRET
         sync: false # MISMO valor que en reto-api-go

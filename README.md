@@ -47,10 +47,10 @@ flowchart LR
     end
     C -->|1. matriz + Bearer| G1
     G1 --> G2 --> G3
-    G3 -->|2. {q, r} + mismo Bearer| N1
+    G3 -->|"2. {q, r} + mismo Bearer"| N1
     N1 --> N2 --> N3
-    N3 -->|3. stats JSON| G3
-    G3 -->|4. {q, r, stats}| C
+    N3 -->|"3. stats JSON"| G3
+    G3 -->|"4. {q, r, stats}"| C
 ```
 
 ### 1.2 Secuencia del flujo principal

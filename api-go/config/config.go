@@ -33,8 +33,10 @@ type Config struct {
 
 // Load lee las env vars con valores por defecto pensados para docker-compose.
 func Load() Config {
+	// Acepta NODE_ENV (convención Node/Docker) o ENV (convención Go); default local.
+	env := getenv("NODE_ENV", getenv("ENV", "development"))
 	return Config{
-		Env:               getenv("ENV", "development"),
+		Env:               env,
 		Port:              getenv("PORT", "3001"),
 		JWTSecret:         getenv("JWT_SECRET", InsecureDefaultSecret),
 		JWTIssuer:         getenv("JWT_ISSUER", "reto-tecnico"),

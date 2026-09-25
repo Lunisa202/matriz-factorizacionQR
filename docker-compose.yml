@@ -9,6 +9,7 @@ services:
       - "3001:3001"
     environment:
       PORT: "3001"
+      NODE_ENV: development # local: permite el secreto de ejemplo (en prod falla a propósito)
       JWT_SECRET: ${JWT_SECRET:-supersecret-reto-tecnico}
       JWT_ISSUER: ${JWT_ISSUER:-reto-tecnico}
       JWT_AUDIENCE: ${JWT_AUDIENCE:-reto-tecnico-apis}
@@ -23,7 +24,8 @@ services:
     networks:
       - reto-net
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      # 127.0.0.1 (no localhost): Fiber escucha solo IPv4 y wget prefiere ::1
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3001/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -38,6 +40,7 @@ services:
       - "3002:3002"
     environment:
       PORT: "3002"
+      NODE_ENV: development # local: permite el secreto de ejemplo (en prod falla a propósito)
       JWT_SECRET: ${JWT_SECRET:-supersecret-reto-tecnico}
       JWT_ISSUER: ${JWT_ISSUER:-reto-tecnico}
       JWT_AUDIENCE: ${JWT_AUDIENCE:-reto-tecnico-apis}
@@ -47,7 +50,7 @@ services:
     networks:
       - reto-net
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3002/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3002/health"]
       interval: 10s
       timeout: 5s
       retries: 5
