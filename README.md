@@ -21,6 +21,7 @@ Dos microservicios comunicados por HTTP, protegidos con JWT compartido, contened
 8. [Despliegue en Render (plan Free)](#8-despliegue-en-render-plan-free)
 9. [Tests](#9-tests)
 10. [Decisiones de diseño (ADRs-lite)](#10-decisiones-de-diseño-adrs-lite)
+11. [Testing manual paso a paso](./TESTING-MANUAL.md) (casos TM-01 a TM-08, local y Render)
 
 ---
 
