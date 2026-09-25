@@ -1,0 +1,34 @@
+# Render Free NO soporta docker-compose: se despliegan 2 Web Services.
+# Pasos: New > Blueprint > conectar repo > este render.yaml. Luego fijar
+# NODE_API_URL del servicio Go con la URL pública del servicio Node.
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: reto-api-go
+    runtime: docker
+    dockerfilePath: ./api-go/Dockerfile
+    dockerContext: ./api-go
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 10000 # Render inyecta su propio PORT; la app usa $PORT
+      - key: JWT_SECRET
+        sync: false # definir manualmente en el dashboard (mismo valor en ambos)
+      - key: NODE_API_URL
+        sync: false # ej: https://reto-api-node.onrender.com/api/stats
+      - key: FORWARD_TIMEOUT
+        value: 90s # el free tier duerme los servicios: despertar a Node tarda ~50s y el default de 10s daría 502
+
+  - type: web
+    name: reto-api-node
+    runtime: docker
+    dockerfilePath: ./api-node/Dockerfile
+    dockerContext: ./api-node
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        sync: false # MISMO valor que en reto-api-go

@@ -1,0 +1,163 @@
+basePath: /
+definitions:
+  models.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      error:
+        type: string
+    type: object
+  models.MatrixRequest:
+    properties:
+      matrix:
+        items:
+          items:
+            format: float64
+            type: number
+          type: array
+        type: array
+    type: object
+  models.QRGatewayError:
+    properties:
+      error:
+        type: string
+      q:
+        items:
+          items:
+            format: float64
+            type: number
+          type: array
+        type: array
+      r:
+        items:
+          items:
+            format: float64
+            type: number
+          type: array
+        type: array
+    type: object
+  models.QRResponse:
+    properties:
+      q:
+        items:
+          items:
+            format: float64
+            type: number
+          type: array
+        type: array
+      r:
+        items:
+          items:
+            format: float64
+            type: number
+          type: array
+        type: array
+      stats: {}
+    type: object
+  models.TokenRequest:
+    properties:
+      user:
+        example: demo
+        type: string
+    type: object
+  models.TokenResponse:
+    properties:
+      token:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: 'Recibe una matriz rectangular, calcula su factorización QR (Gram-Schmidt)
+    y reenvía {q, r} a la API de Node. "Try it out" apunta a este mismo servidor:
+    pide un token en POST /api/auth/token, pulsa Authorize (Bearer) y prueba.'
+  title: Reto técnico — API Go (Fiber)
+  version: 1.0.0
+paths:
+  /api/auth/token:
+    post:
+      consumes:
+      - application/json
+      description: 'Paso 1 para probar en Swagger: copia el token, pulsa Authorize
+        e introdúcelo como "Bearer <token>".'
+      parameters:
+      - description: Usuario (opcional, default demo)
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/models.TokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TokenResponse'
+        "404":
+          description: Emisor demo desactivado
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Emite un JWT demo
+      tags:
+      - auth
+  /api/matrix/qr:
+    post:
+      consumes:
+      - application/json
+      description: 'Flujo completo: valida la matriz rectangular, calcula QR con Gram-Schmidt
+        y reenvía {q, r} a la API de Node, que responde las estadísticas.'
+      parameters:
+      - description: Matriz rectangular (array de arrays)
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.MatrixRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.QRResponse'
+        "400":
+          description: JSON o matriz inválidos
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Sin token o inválido
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "413":
+          description: Excede MAX_MATRIX_ELEMENTS
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "502":
+          description: QR calculado pero Node inalcanzable (incluye q y r)
+          schema:
+            $ref: '#/definitions/models.QRGatewayError'
+      security:
+      - Bearer: []
+      summary: Factoriza la matriz (QR) y devuelve Q, R y estadísticas de Node
+      tags:
+      - matrix
+  /health:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'ej: {status: ok, service: api-go}'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Salud del servicio
+      tags:
+      - ops
+securityDefinitions:
+  Bearer:
+    description: JWT con formato "Bearer <token>".
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

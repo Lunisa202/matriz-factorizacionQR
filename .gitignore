@@ -1,0 +1,22 @@
+# Dependencias y secretos (nunca al repo)
+node_modules/
+.env
+.env.local
+
+# Artefactos de Go (binarios, coverage). OJO: api-go/docs/ (Swagger generado)
+# NO se ignora a propósito: el Dockerfile lo necesita para compilar sin swag CLI.
+*.exe
+*.out
+coverage.txt
+coverage.html
+
+# Temporales del sistema / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+
+# Basura de pruebas manuales
+e2e_check.json
+docs_check.json

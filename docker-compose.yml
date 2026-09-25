@@ -1,0 +1,57 @@
+services:
+  api-go:
+    build:
+      context: ./api-go
+      dockerfile: Dockerfile
+    container_name: api-go
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: "3001"
+      JWT_SECRET: ${JWT_SECRET:-supersecret-reto-tecnico}
+      JWT_ISSUER: ${JWT_ISSUER:-reto-tecnico}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-reto-tecnico-apis}
+      ENABLE_DEMO_TOKEN: ${ENABLE_DEMO_TOKEN:-true}
+      MAX_MATRIX_ELEMENTS: ${MAX_MATRIX_ELEMENTS:-10000}
+      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-100}
+      # Dentro de compose, Node se alcanza por nombre de servicio.
+      NODE_API_URL: http://api-node:3002/api/stats
+    depends_on:
+      api-node:
+        condition: service_healthy
+    networks:
+      - reto-net
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api-node:
+    build:
+      context: ./api-node
+      dockerfile: Dockerfile
+    container_name: api-node
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: "3002"
+      JWT_SECRET: ${JWT_SECRET:-supersecret-reto-tecnico}
+      JWT_ISSUER: ${JWT_ISSUER:-reto-tecnico}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-reto-tecnico-apis}
+      ENABLE_DEMO_TOKEN: ${ENABLE_DEMO_TOKEN:-true}
+      MAX_MATRIX_ELEMENTS: ${MAX_MATRIX_ELEMENTS:-10000}
+      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-100}
+    networks:
+      - reto-net
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  reto-net:
+    driver: bridge

@@ -1,0 +1,243 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Recibe una matriz rectangular, calcula su factorización QR (Gram-Schmidt) y reenvía {q, r} a la API de Node. \"Try it out\" apunta a este mismo servidor: pide un token en POST /api/auth/token, pulsa Authorize (Bearer) y prueba.",
+        "title": "Reto técnico — API Go (Fiber)",
+        "contact": {},
+        "version": "1.0.0"
+    },
+    "basePath": "/",
+    "paths": {
+        "/api/auth/token": {
+            "post": {
+                "description": "Paso 1 para probar en Swagger: copia el token, pulsa Authorize e introdúcelo como \"Bearer \u003ctoken\u003e\".",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Emite un JWT demo",
+                "parameters": [
+                    {
+                        "description": "Usuario (opcional, default demo)",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/models.TokenRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TokenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Emisor demo desactivado",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/matrix/qr": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Flujo completo: valida la matriz rectangular, calcula QR con Gram-Schmidt y reenvía {q, r} a la API de Node, que responde las estadísticas.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "matrix"
+                ],
+                "summary": "Factoriza la matriz (QR) y devuelve Q, R y estadísticas de Node",
+                "parameters": [
+                    {
+                        "description": "Matriz rectangular (array de arrays)",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.MatrixRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.QRResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "JSON o matriz inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Sin token o inválido",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "413": {
+                        "description": "Excede MAX_MATRIX_ELEMENTS",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "QR calculado pero Node inalcanzable (incluye q y r)",
+                        "schema": {
+                            "$ref": "#/definitions/models.QRGatewayError"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ops"
+                ],
+                "summary": "Salud del servicio",
+                "responses": {
+                    "200": {
+                        "description": "ej: {status: ok, service: api-go}",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.MatrixRequest": {
+            "type": "object",
+            "properties": {
+                "matrix": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "number",
+                            "format": "float64"
+                        }
+                    }
+                }
+            }
+        },
+        "models.QRGatewayError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "q": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "number",
+                            "format": "float64"
+                        }
+                    }
+                },
+                "r": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "number",
+                            "format": "float64"
+                        }
+                    }
+                }
+            }
+        },
+        "models.QRResponse": {
+            "type": "object",
+            "properties": {
+                "q": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "number",
+                            "format": "float64"
+                        }
+                    }
+                },
+                "r": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "number",
+                            "format": "float64"
+                        }
+                    }
+                },
+                "stats": {}
+            }
+        },
+        "models.TokenRequest": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "type": "string",
+                    "example": "demo"
+                }
+            }
+        },
+        "models.TokenResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "description": "JWT con formato \"Bearer \u003ctoken\u003e\".",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

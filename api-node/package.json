@@ -1,0 +1,27 @@
+{
+  "name": "api-node",
+  "version": "1.0.0",
+  "description": "API 2 - Express.js: estadísticas sobre matrices Q y R (reto técnico)",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.1"
+  }
+}
